@@ -26,3 +26,5 @@ carla-*.tar
 /tmp/
 
 .DS_Store
+
+testCase

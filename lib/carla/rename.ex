@@ -42,8 +42,8 @@ defmodule Carla.Rename do
   def format_file_name(file_name, "camel") do
     formatted =
       file_name
-      |> String.replace(["(", ")", "’", "!"], "")
-      |> String.split([" ", ",", "_"])
+      |> String.replace(["[", "]", "{", "}", "(", ")", "’", "!"], "")
+      |> String.split([" ", ",", "_", "-"])
       |> then(fn [first_word | others] ->
         Enum.reduce(others, String.downcase(first_word), fn others, acc ->
           acc <> String.capitalize(others)
