@@ -13,3 +13,13 @@ Just clone this repo, go to it and exec `mix escript.build`
 Your exec file will be in `script` folder.
 
 Then you can add an alias in .zshrc (for example) for the path to this file and use it :)
+
+## Examples
+
+### Rename Files
+
+![rename-files-example](images/rename-files-example.png)
+
+### Rename String
+
+![rename-string-example](images/rename-string-example.png)
