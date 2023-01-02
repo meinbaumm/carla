@@ -69,13 +69,21 @@ defmodule Carla.Rename do
 
   defp format(list_files, rename_style) do
     Stream.map(list_files, fn file ->
+      {base_name, ext_name} = get_base_and_ext_name(file)
+
       formatted_file =
-        file
+        base_name
         |> process_string()
         |> recase(rename_style)
 
-      {file, formatted_file}
+      {file, formatted_file <> ext_name}
     end)
+  end
+
+  defp get_base_and_ext_name(file_name) do
+    ext_name = Path.extname(file_name)
+
+    {Path.basename(file_name, ext_name), ext_name}
   end
 
   defp rename(list_files) do
@@ -94,7 +102,7 @@ defmodule Carla.Rename do
     end
   end
 
-  defp get_args(args) do
+  defp get_file_renaming_args(args) do
     case args do
       [] -> {:error, :no_arguments}
       arguments -> {:ok, arguments}
@@ -109,7 +117,7 @@ defmodule Carla.Rename do
   end
 
   def rename_files(args) do
-    with {:ok, [rename_style | [path | extensions]]} <- get_args(args),
+    with {:ok, [rename_style | [path | extensions]]} <- get_file_renaming_args(args),
          {:ok, valid_style_format} <- is_valid_style_format(rename_style),
          {:ok, extensions} <- is_extension(extensions),
          :ok <- change_directory(path) do
@@ -127,6 +135,28 @@ defmodule Carla.Rename do
         IO.puts(message)
 
       {:error, message} ->
+        IO.puts(message)
+    end
+  end
+
+  def get_string_renaming_args(args) do
+    case args do
+      [_string_to_rename] -> {:error, :not_enough_arguments}
+      [_string_to_rename | _style_to_rename] -> {:ok, args}
+    end
+  end
+
+  def rename_string(args) do
+    with {:ok, [string_to_rename | [style_to_rename]]} <- get_string_renaming_args(args),
+         {:ok, valid_style_format} <- is_valid_style_format(style_to_rename) do
+      string_to_rename
+      |> recase(valid_style_format)
+      |> IO.puts()
+    else
+      {:error, :not_enough_arguments} ->
+        IO.puts("Error: maybe some arguments were not passed.")
+
+      {:error, :invalid_style_format, message} ->
         IO.puts(message)
     end
   end

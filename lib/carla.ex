@@ -8,6 +8,7 @@ defmodule Carla do
 
   # TODO: Create function for reading flags
   # TODO: On calling carla print info and maybe logo and som flags info as in other cli applications.
+  # TODO: Do not rename directories without flag File.lstat(file_name)
 
   alias Carla.Rename
 
@@ -22,7 +23,9 @@ defmodule Carla do
 
   def main(arguments) do
     case arguments do
-      ["rename-file" | args_for_rename] -> Rename.rename_files(args_for_rename)
+      ["rename-files" | args_for_rename] -> Rename.rename_files(args_for_rename)
+      ["rename-string" | args_for_rename] -> Rename.rename_string(args_for_rename)
+      # ["fuck"] -> Rename.fuck() |> IO.inspect()
       [] -> greeting_message()
     end
   end
