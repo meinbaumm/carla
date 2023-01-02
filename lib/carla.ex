@@ -3,8 +3,7 @@ defmodule Carla do
   A module for quickly renaming files by converting them to camel_case and removing unnecessary characters.
 
   # How to
-  1. Rename files in current directory: `ex_rename_files . .txt`
-  2. Rename all files in all directories: `for d in */ ; do ex_rename_files $d .pdf .epub .txt; done`.
+  1. Rename all files in all directories: `for d in */ ; do ex_rename_files $d .pdf .epub .txt; done`.
   """
 
   # TODO: Create function for reading flags
@@ -12,13 +11,19 @@ defmodule Carla do
 
   alias Carla.Rename
 
-  def get_console_arguments do
-    System.argv()
+  def greeting_message do
+    """
+    Hi! I am Carla, your personal helper.
+
+    Just call me `carla [action] [style] [directory] [file-formats]`
+    """
+    |> IO.puts()
   end
 
-  def main do
-    case get_console_arguments() do
+  def main(arguments) do
+    case arguments do
       ["rename" | args_for_rename] -> Rename.rename_files(args_for_rename)
+      [] -> greeting_message()
     end
   end
 end

@@ -1,17 +1,35 @@
 defmodule Carla.Rename do
+  @moduledoc """
+  Rename is a utility for renaming file names with a given extension from one style to another.
+  """
+
   @valid_style_formats ~w(snake camel kebab)
 
   def is_valid_style_format(format) do
     if format in @valid_style_formats do
       {:ok, format}
     else
-      {:error, :invalid_style_format}
+      {:error, :invalid_style_format,
+       "Error: invalid style format #{format}. Available styles are #{Enum.join(@valid_style_formats, ", ")}"}
+    end
+  end
+
+  def is_extension(extensions) do
+    case extensions do
+      "--all" ->
+        "--all"
+
+      [] ->
+        {:error, :no_extension, "Error: no file extension or --all flag passed."}
+
+      _ ->
+        {:ok, extensions}
     end
   end
 
   defp list_files(extension) do
     case extension do
-      "*" ->
+      "--all" ->
         File.ls!()
 
       _ ->
@@ -87,13 +105,14 @@ defmodule Carla.Rename do
   defp change_directory(path) do
     case File.cd(path) do
       :ok -> :ok
-      {:error, :enoent} -> {:error, "Invalid path #{path}."}
+      {:error, :enoent} -> {:error, "Error: invalid path #{path}."}
     end
   end
 
   def rename_files(args) do
     with {:ok, [rename_style | [path | extensions]]} <- get_args(args),
          {:ok, valid_style_format} <- is_valid_style_format(rename_style),
+         {:ok, extensions} <- is_extension(extensions),
          :ok <- change_directory(path) do
       Enum.map(extensions, fn file_extension ->
         format_and_rename(file_extension, valid_style_format)
@@ -102,13 +121,14 @@ defmodule Carla.Rename do
       {:error, :no_arguments} ->
         IO.puts("No arguments.")
 
-      {:error, :invalid_style_format} ->
-        IO.puts(
-          "Invalid style format. Available styles are #{Enum.join(@valid_style_formats, ", ")}"
-        )
+      {:error, :invalid_style_format, message} ->
+        IO.puts(message)
+
+      {:error, :no_extension, message} ->
+        IO.puts(message)
 
       {:error, message} ->
-        IO.puts("#{message}")
+        IO.puts(message)
     end
   end
 end
