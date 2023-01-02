@@ -1,16 +1,24 @@
 defmodule Carla.Rename do
   @moduledoc """
-  Rename is a utility for renaming file names with a given extension from one style to another.
+  Rename is a collection of functions for renaming file names with a given extension from one style to another.
   """
 
-  @valid_style_formats ~w(snake camel kebab)
+  def valid_style_formats do
+    ~w(snake camel kebab pascal dot title path header constant name sentence)
+  end
+
+  def available_valid_style_formats do
+    valid_style_formats()
+    |> Enum.sort()
+    |> Enum.join(", ")
+  end
 
   def is_valid_style_format(format) do
-    if format in @valid_style_formats do
+    if format in valid_style_formats() do
       {:ok, format}
     else
       {:error, :invalid_style_format,
-       "Error: invalid style format #{format}. Available styles are #{Enum.join(@valid_style_formats, ", ")}"}
+       "Error: invalid style format #{format}. Available styles are: #{available_valid_style_formats()}"}
     end
   end
 
@@ -37,46 +45,37 @@ defmodule Carla.Rename do
     end
   end
 
-  def format_file_name(file_name, "snake") do
-    formatted =
-      file_name
-      |> String.replace([" ", "-", "__", "___", ","], "_")
-      |> String.replace(["(", ")", "’", "!", ".com", "._", "_.", "[", "]", "{", "}", "?"], "")
-      |> String.downcase()
-
-    {file_name, formatted}
+  def process_string(file_name) do
+    file_name
+    |> String.replace([" ", "-", "__", "___", ","], " ")
+    |> String.replace(["(", ")", "’", "!", ".com", "._", "_.", "[", "]", "{", "}", "?"], "")
   end
 
-  def format_file_name(file_name, "kebab") do
-    formatted =
-      file_name
-      |> String.replace([" ", "_", "__", "___", ","], "-")
-      |> String.replace(["(", ")", "’", "!", ".com", "._", "_.", "[", "]", "{", "}", "?"], "")
-      |> String.downcase()
-
-    {file_name, formatted}
-  end
-
-  def format_file_name(file_name, "camel") do
-    formatted =
-      file_name
-      |> String.replace(["[", "]", "{", "}", "(", ")", "’", "!"], "")
-      |> String.split([" ", ",", "_", "-"])
-      |> then(fn [first_word | others] ->
-        Enum.reduce(others, String.downcase(first_word), fn others, acc ->
-          acc <> String.capitalize(others)
-        end)
-      end)
-      |> String.replace(
-        [" ", "-", "__", "___", ".com", "._", "_.", "[", "]", ",", "{", "}", "?"],
-        ""
-      )
-
-    {file_name, formatted}
+  def recase(file_name, case_style) do
+    case case_style do
+      "snake" -> Recase.to_snake(file_name)
+      "camel" -> Recase.to_camel(file_name)
+      "kebab" -> Recase.to_kebab(file_name)
+      "pascal" -> Recase.to_pascal(file_name)
+      "dot" -> Recase.to_dot(file_name)
+      "title" -> Recase.to_title(file_name)
+      "path" -> Recase.to_path(file_name)
+      "header" -> Recase.to_header(file_name)
+      "constant" -> Recase.to_constant(file_name)
+      "name" -> Recase.to_name(file_name)
+      "sentence" -> Recase.to_sentence(file_name)
+    end
   end
 
   defp format(list_files, rename_style) do
-    Stream.map(list_files, fn file -> format_file_name(file, rename_style) end)
+    Stream.map(list_files, fn file ->
+      formatted_file =
+        file
+        |> process_string()
+        |> recase(rename_style)
+
+      {file, formatted_file}
+    end)
   end
 
   defp rename(list_files) do
