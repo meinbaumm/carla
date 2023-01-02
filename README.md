@@ -1,21 +1,15 @@
 # Carla
 
-**TODO: Add description**
+A helper utility.
+
+At the moment it can rename files from one style case to another and rename strings in the same way.
+
+I got the idea for it after manually renaming a lot of files. This is very boring and tedious. However, it is convenient for me to work with files from the terminal when they are named in the same style case.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `carla` to your list of dependencies in `mix.exs`:
+Just clone this repo, go to it and exec `mix escript.build`
 
-```elixir
-def deps do
-  [
-    {:carla, "~> 0.1.0"}
-  ]
-end
-```
+Your exec file will be in `script` folder.
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/carla>.
-
+Then you can add an alias in .zshrc (for example) for the path to this file and use it :)

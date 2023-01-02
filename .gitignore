@@ -24,3 +24,9 @@ carla-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+.DS_Store
+
+testCase
+
+script/carla
